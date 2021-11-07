@@ -53,6 +53,9 @@ class ApiMedicalRecordApplicationTests{
 			ClinicalBackground(UUID.randomUUID(), randomUUID, ClinicalType.VACCINE, "BCG",
 				created_at = "2021-03-03T09:55:00")
 		)
+		mockMvc.perform(MockMvcRequestBuilders.get("/$randomUUID/clinical_backgrounds"))
+			.andExpect(MockMvcResultMatchers.status().isOk)
+			.andDo(MockMvcResultHandlers.print())
 		val clinicalBackground =  medicalRecordRepository.findAllWithPersonId(randomUUID)
 		Assertions.assertEquals(clinicalBackground.count { it.person_id == randomUUID}, 1)
 	}
