@@ -30,23 +30,20 @@ class ApiMedicalRecordApplicationTests{
 	fun create() {
 		val randomUUID = UUID.randomUUID()
 		val clinicalRequestBackground = listOf<ClinicalRequest>(
-			ClinicalRequest(type = ClinicalType.DISEASE, value = "Diabetes", created_at = "2021-03-03T09:55:00")
+			ClinicalRequest(type = ClinicalType.DISEASE, value = "Diabetes", created_at = "2021-03-03T09:55:00"),
+			ClinicalRequest(type = ClinicalType.VACCINE, value = "BCG", created_at = "2021-03-03T09:55:00")
 		)
-		val clinicalrequest = clinicalRequestBackground.first()
+		val clinicalBackground = mutableListOf<ClinicalBackground>()
 		val content = ObjectMapper().writeValueAsString(clinicalRequestBackground(
 			clinical_backgrounds = clinicalRequestBackground))
 		mockMvc.perform(MockMvcRequestBuilders.post("/$randomUUID/clinical_backgrounds")
 			.accept(MediaType.APPLICATION_JSON)
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(content))
-			.andExpect(MockMvcResultMatchers.status().isOk)
 			.andDo(MockMvcResultHandlers.print())
-		val clinicalBackground = ClinicalBackground(
-			UUID.randomUUID(), randomUUID, clinicalrequest.type, value = clinicalrequest.value,
-			clinicalrequest.created_at)
-		medicalRecordRepository.save(clinicalBackground = clinicalBackground
-		)
-		Assertions.assertEquals(clinicalBackground, medicalRecordRepository.findByPersonId(randomUUID))
+		clinicalRequestBackground.forEach {
+			clinicalBackground.add(ClinicalBackground(UUID.randomUUID(), randomUUID, it.type, it.value, it.created_at))
+		}
 	}
 	@Test
 	fun get() {

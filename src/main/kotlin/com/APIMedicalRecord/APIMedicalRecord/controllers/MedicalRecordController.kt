@@ -13,28 +13,30 @@ class MedicalRecordController(private val medicalRecordRepository: MedicalRecord
     @PostMapping("{person_id}/clinical_backgrounds")
     fun create(@PathVariable person_id: UUID, @RequestBody clinicalRequest: clinicalRequestBackground):
             ResponseEntity<Any> {
-        val clinicalBackgroundRequest = clinicalRequest.clinical_backgrounds.first()
         val clinicalBackgroundResponse = mutableListOf<ClinicalBackground>()
-        val clinicalBackground = ClinicalBackground(
-            id = UUID.randomUUID(), person_id = person_id, type = clinicalBackgroundRequest.type,
-            value = clinicalBackgroundRequest.value, created_at = clinicalBackgroundRequest.created_at
-        )
-        if (!medicalRecordRepository.checkEnum(clinicalRequest = clinicalBackgroundRequest)) {
-            return ResponseEntity.badRequest().body(
-                "The ${clinicalBackgroundRequest.type} doesn't contains ${clinicalBackgroundRequest.value}")
-        } else {
-            medicalRecordRepository.save(clinicalBackground)
-            clinicalBackgroundResponse.add(clinicalBackground)
+        clinicalRequest.clinical_backgrounds.forEach {
+            val clinicalBackground = ClinicalBackground(
+                id = UUID.randomUUID(), person_id = person_id, type = it.type,
+                value = it.value, created_at = it.created_at
+            )
+            if (!medicalRecordRepository.checkEnum(clinicalRequest = it)) {
+                return ResponseEntity.badRequest().body(
+                    "The ${it.type} doesn't contains ${it.value}")
+            } else {
+                medicalRecordRepository.save(clinicalBackground)
+                clinicalBackgroundResponse.add(clinicalBackground)
+            }
         }
         return ResponseEntity.ok().body(ClinicalBackgroundResponse(
             clinical_backgrounds = clinicalBackgroundResponse))
     }
     @GetMapping("{person_id}/clinical_backgrounds")
     fun get(@PathVariable person_id: UUID): ResponseEntity<Any> {
-        val clinicalBackground = medicalRecordRepository.findByPersonId(person_id = person_id)
-        if (clinicalBackground != null) {
-            return ResponseEntity.ok().body(clinicalBackground)
+        return try {
+            val clinicalBackgroundResponse = medicalRecordRepository.findAllWithPersonId(person_id)
+            ResponseEntity.ok().body(ClinicalBackgroundResponse(clinical_backgrounds = clinicalBackgroundResponse))
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body("Clinical Background not found!")
         }
-        return ResponseEntity.badRequest().body("Clinical Background not found!")
     }
 }
