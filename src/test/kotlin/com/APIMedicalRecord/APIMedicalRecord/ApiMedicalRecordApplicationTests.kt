@@ -44,10 +44,17 @@ class ApiMedicalRecordApplicationTests{
 		clinicalRequestBackground.forEach {
 			clinicalBackground.add(ClinicalBackground(UUID.randomUUID(), randomUUID, it.type, it.value, it.created_at))
 		}
+		Assertions.assertEquals(clinicalBackground.count { it.person_id == randomUUID}, 2)
 	}
 	@Test
 	fun get() {
-
+		val randomUUID = UUID.randomUUID()
+		medicalRecordRepository.save(
+			ClinicalBackground(UUID.randomUUID(), randomUUID, ClinicalType.VACCINE, "BCG",
+				created_at = "2021-03-03T09:55:00")
+		)
+		val clinicalBackground =  medicalRecordRepository.findAllWithPersonId(randomUUID)
+		Assertions.assertEquals(clinicalBackground.count { it.person_id == randomUUID}, 1)
 	}
 	@Test
 	fun checkEnum() {
