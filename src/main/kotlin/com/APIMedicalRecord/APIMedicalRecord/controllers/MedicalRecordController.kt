@@ -8,15 +8,13 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-class MedicalRecordController(private val medicalRecordRepository: MedicalRecordRepository) {
-
+class MedicalRecordController {
+    private val clinicalBackgroundResponse = mutableListOf<ClinicalBackground>()
+    val medicalRecordRepository = MedicalRecordRepository(clinicalBackgroundResponse)
     @PostMapping("{person_id}/clinical_backgrounds")
-    fun create(@PathVariable person_id: UUID, @RequestBody clinicalRequest: clinicalRequestBackground):
-            ResponseEntity<Any> {
-        val clinicalBackgroundResponse = mutableListOf<ClinicalBackground>()
+    fun create(@PathVariable person_id: UUID, @RequestBody clinicalRequest: clinicalRequestBackground): ResponseEntity<Any> {
         clinicalRequest.clinical_backgrounds.forEach {
-            val clinicalBackground = ClinicalBackground(
-                id = UUID.randomUUID(), person_id = person_id, type = it.type,
+            val clinicalBackground = ClinicalBackground(id = UUID.randomUUID(), person_id = person_id, type = it.type,
                 value = it.value, created_at = it.created_at
             )
             if (!medicalRecordRepository.checkEnum(clinicalRequest = it)) {
@@ -24,7 +22,6 @@ class MedicalRecordController(private val medicalRecordRepository: MedicalRecord
                     "The ${it.type} doesn't contains ${it.value}")
             } else {
                 medicalRecordRepository.save(clinicalBackground)
-                clinicalBackgroundResponse.add(clinicalBackground)
             }
         }
         return ResponseEntity.ok().body(ClinicalBackgroundResponse(
@@ -33,8 +30,8 @@ class MedicalRecordController(private val medicalRecordRepository: MedicalRecord
     @GetMapping("{person_id}/clinical_backgrounds")
     fun get(@PathVariable person_id: UUID): ResponseEntity<Any> {
         return try {
-            val clinicalBackgroundResponse = medicalRecordRepository.findAllWithPersonId(person_id)
-            ResponseEntity.ok().body(ClinicalBackgroundResponse(clinical_backgrounds = clinicalBackgroundResponse))
+            val foundClinicalBackground = medicalRecordRepository.findAllWithPersonId(person_id)
+            ResponseEntity.ok().body(ClinicalBackgroundResponse(clinical_backgrounds = foundClinicalBackground))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body("Clinical Background not found!")
         }
