@@ -11,16 +11,20 @@ class MedicalRecordRepository(private val clinicsBackground: MutableList<Clinica
     fun save(clinicalBackground: ClinicalBackground) {
         clinicsBackground.add(clinicalBackground)
     }
+
     fun checkEnum(clinicalRequest: ClinicalRequest): Boolean{
         return clinicalRequest.type.values.contains(clinicalRequest.value)
     }
+
     fun findAllWithPersonId(person_id: UUID): List<ClinicalBackground> {
         val clinicalBackgroundResponse = mutableListOf<ClinicalBackground>()
+
         clinicsBackground.forEach {
             if (it.person_id == person_id) {
                 clinicalBackgroundResponse.add(it)
             }
         }
+
         return clinicalBackgroundResponse
     }
 }

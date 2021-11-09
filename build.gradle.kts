@@ -17,6 +17,7 @@ repositories {
 }
 
 dependencies {
+	implementation ("com.google.code.gson:gson:2.8.5")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("mysql:mysql-connector-java:8.0.15")
