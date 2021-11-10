@@ -6,15 +6,12 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class MedicalRecordRepository(private val clinicsBackground: MutableList<ClinicalBackground>)
+class MedicalRecordRepository()
 {
-    fun save(clinicalBackground: ClinicalBackground) {
-        clinicsBackground.add(clinicalBackground)
-    }
+    private val clinicsBackground = mutableListOf<ClinicalBackground>()
 
-    fun checkEnum(clinicalRequest: ClinicalRequest): Boolean{
-        return clinicalRequest.type.values.contains(clinicalRequest.value)
-    }
+    fun save(clinicalBackground: ClinicalBackground) =
+        clinicsBackground.add(clinicalBackground).let { clinicalBackground }
 
     fun findAllWithPersonId(person_id: UUID): List<ClinicalBackground> {
         val clinicalBackgroundResponse = mutableListOf<ClinicalBackground>()
@@ -27,4 +24,9 @@ class MedicalRecordRepository(private val clinicsBackground: MutableList<Clinica
 
         return clinicalBackgroundResponse
     }
+    fun saveAll(clinicalBackground: List<ClinicalBackground>) =
+        clinicsBackground.addAll(clinicalBackground).let {
+            clinicsBackground
+        }
+
 }

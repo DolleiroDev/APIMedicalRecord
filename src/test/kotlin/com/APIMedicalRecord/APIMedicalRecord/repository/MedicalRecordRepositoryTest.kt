@@ -1,4 +1,4 @@
-package com.APIMedicalRecord.APIMedicalRecord
+package com.APIMedicalRecord.APIMedicalRecord.repository
 
 import com.APIMedicalRecord.APIMedicalRecord.models.ClinicalBackground
 import com.APIMedicalRecord.APIMedicalRecord.repositories.MedicalRecordRepository
@@ -13,7 +13,8 @@ import java.util.*
 @SpringBootTest
 class MedicalRecordRepositoryTest {
     private val actualList = mutableListOf<ClinicalBackground>()
-    val medicalRecordRepository = MedicalRecordRepository(actualList)
+    val medicalRecordRepository = MedicalRecordRepository()
+
     @Test
     fun `when save should add on list`() {
         val clinicalBackground = ClinicalBackground(
@@ -27,18 +28,6 @@ class MedicalRecordRepositoryTest {
         Assertions.assertEquals(testList, actualList)
     }
     @Test
-    fun `should check if value belongs to type`() {
-        val clinicalRequest = ClinicalRequest(ClinicalType.DISEASE, "Alzheimer", "2021-03-03T09:55:00")
-        val checkedEnum = medicalRecordRepository.checkEnum(clinicalRequest)
-        Assertions.assertTrue(checkedEnum)
-    }
-    @Test
-    fun `should check if value doesn't belongs to type`() {
-        val clinicalRequest = ClinicalRequest(ClinicalType.DISEASE, "Batata", "2021-03-03T09:55:00")
-        val checkedEnum = medicalRecordRepository.checkEnum(clinicalRequest)
-        Assertions.assertFalse(checkedEnum)
-    }
-    @Test
     fun `should return all backgrounds with a specific id`() {
         val randomID = UUID.randomUUID()
         val clinicalBackgroundTest = ClinicalBackground(
@@ -46,8 +35,10 @@ class MedicalRecordRepositoryTest {
             created_at = "2021-03-03T09:55:00"
         )
         val testList = mutableListOf<ClinicalBackground>()
+
         actualList.add(clinicalBackgroundTest)
         testList.add(clinicalBackgroundTest)
+
         val clinicalBackgrounds = medicalRecordRepository.findAllWithPersonId(randomID)
         Assertions.assertEquals(testList, clinicalBackgrounds)
     }
